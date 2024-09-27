@@ -1,0 +1,449 @@
+openapi: 3.0.1
+info:
+  title: HCD Content (Shared)
+  version: v1
+paths: {}
+components:
+  schemas:
+    ContentState:
+      enum:
+        - draft
+        - published        
+        - obsolete
+      type: string
+    ContentType:
+      enum:
+        - youtube
+        - htmlLink
+        - blogPost
+      type: string
+    TouchPoint:
+      enum:
+        - preSales
+        - postSales
+      type: string    
+    ContentSimpleListDto:
+      type: object
+      additionalProperties: false
+      properties:
+        page:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalCount:
+          type: integer
+          format: int32
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentSimpleDto'
+          nullable: true
+    ContentSimpleDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        perex:
+          type: string
+          nullable: true
+        touchpoint:
+          type: string
+          enum:
+            - preSales
+            - postSales
+          nullable: true
+        contentType:
+          type: string
+          enum:
+            - youtube
+            - htmlLink
+            - blogPost
+            - banner
+          nullable: true
+        url:
+          type: string
+          nullable: true
+        author:
+          allOf:
+            - $ref: '../gma-shared/common.yaml#/components/schemas/AuthorDto'
+          nullable: true
+        blogpostImage:
+          allOf:
+            - $ref: '../gma-shared/common.yaml#/components/schemas/ImageDto'
+          nullable: true
+        categoryId:
+          type: string
+          format: uuid
+    BannerCtaType:
+      enum:
+        - homepageMain
+        - homepageGame
+        - inAppNavigation
+        - homepagePosLoan
+        - loanSection
+        - creditCardDashboard
+        - creditCardLoyaltyDashboard
+        - cardActivationSuccessful
+        - cardSetPinSuccessful
+        - cardRepayment
+        - loanRepayment
+        - loanDashboard
+      type: string
+    Author:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          nullable: true
+        role:
+          type: string
+          nullable: true
+        icon:
+          type: string
+          nullable: true
+    LookupValue:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+ # messages         
+  messages:
+    ContentCreatedMessage: 
+      type: object
+      additionalProperties: false
+      properties: 
+        id: 
+          type: string
+          format: uuid
+        title: 
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        state: 
+          $ref: "#/components/schemas/ContentState"
+        description: 
+          type: string
+          nullable: true
+        contentType: 
+          $ref: "#/components/schemas/ContentType"
+        url: 
+          type: string
+          nullable: true
+        perex: 
+          type: string
+          nullable: true
+        touchpoint: 
+          $ref: "#/components/schemas/TouchPoint"
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+        blogPostCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+        images: 
+          type: array
+          items: 
+            $ref: "../gma-shared/common.yaml#/components/schemas/ImageDto"
+            nullable: true
+        author: 
+          $ref: "../gma-shared/common.yaml#/components/schemas/AuthorDto"
+        blogpostImage: 
+          $ref: "../gma-shared/common.yaml#/components/schemas/ImageDto"
+        fullText: 
+          type: string
+          nullable: true
+        xTest:
+          type: boolean
+          default: false
+    ContentUpdatedMessage: 
+      type: object
+      additionalProperties: false
+      properties: 
+        id: 
+          type: string
+          format: uuid
+        title: 
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        state: 
+          $ref: "#/components/schemas/ContentState"
+        description: 
+          type: string
+          nullable: true
+        contentType: 
+          $ref: "#/components/schemas/ContentType"
+        url: 
+          type: string
+          nullable: true
+        perex: 
+          type: string
+          nullable: true
+        touchpoint: 
+          $ref: "#/components/schemas/TouchPoint"
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+        blogPostCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+        images: 
+          type: array
+          items: 
+            $ref: "../gma-shared/common.yaml#/components/schemas/ImageDto"
+            nullable: true
+        author: 
+          $ref: "../gma-shared/common.yaml#/components/schemas/AuthorDto"
+        blogpostImage: 
+          $ref: "../gma-shared/common.yaml#/components/schemas/ImageDto"
+        fullText: 
+          type: string
+          nullable: true
+        xTest:
+          type: boolean
+          default: false
+    ContentRemovedMessage:
+      type: object
+      additionalProperties: false
+      properties:
+        id: 
+          type: string
+          format: uuid
+        xTest:
+          type: boolean
+          default: false
+    BannerCreatedMessage:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        image:
+          $ref: '#/components/schemas/Image'
+        ctaType:
+          $ref: '#/components/schemas/BannerCtaType'       
+        link:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean          
+          default: true
+        orderNum:
+          type: integer          
+          format: int32
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+          nullable: true
+        updatedBy:
+          type: string
+          nullable: true
+        xTest:
+          type: boolean
+    BannerUpdatedMessage:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        image:
+          $ref: '#/components/schemas/Image'
+        ctaType:
+          $ref: '#/components/schemas/BannerCtaType'       
+        link:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean          
+          default: true
+        orderNum:
+          type: integer          
+          format: int32
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+          nullable: true
+        updatedBy:
+          type: string
+          nullable: true
+        xTest:
+          type: boolean
+    BannerDeletedMessage:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        xTest:
+          type: boolean
+    BlogPostCreatedMessage:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+          nullable: true
+        updatedBy:
+          type: string
+          nullable: true
+        author:
+          $ref: '#/components/schemas/Author'
+        title:
+          $ref: '../gma-shared/common.yaml#/components/schemas/LocalizedText'
+        text:
+          $ref: '../gma-shared/common.yaml#/components/schemas/LocalizedText'
+        url:
+          type: string
+          nullable: true
+        carousel:
+          type: boolean
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+        blogPostCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+        otherYouTubes:
+          type: array
+          items:
+            $ref: '#/components/schemas/LookupValue'
+        otherLinks:
+          type: array
+          items:
+            $ref: '#/components/schemas/LookupValue'    
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true     
+        validTo:
+          type: string
+          format: date-time
+          nullable: true      
+        enabled:
+          type: boolean            
+        xTest:
+          type: boolean
+        localizedImage:
+          $ref: '../gma-shared/common.yaml#/components/schemas/LocalizedText'
+          nullable: true
+        localizedThumbnail:
+          $ref: '../gma-shared/common.yaml#/components/schemas/LocalizedText'    
+          nullable: true                   
+    BlogPostUpdatedMessage:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+          nullable: true
+        updatedBy:
+          type: string
+          nullable: true
+        author:
+          $ref: '#/components/schemas/Author'
+        title:
+          $ref: '../gma-shared/common.yaml#/components/schemas/LocalizedText'
+        text:
+          $ref: '../gma-shared/common.yaml#/components/schemas/LocalizedText'
+        url:
+          type: string
+          nullable: true
+        carousel:
+          type: boolean
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+        blogPostCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+        otherYouTubes:
+          type: array
+          items:
+            $ref: '#/components/schemas/LookupValue'
+        otherLinks:
+          type: array
+          items:
+            $ref: '#/components/schemas/LookupValue'    
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true     
+        validTo:
+          type: string
+          format: date-time
+          nullable: true      
+        enabled:
+          type: boolean            
+        xTest:
+          type: boolean
+        localizedImage:
+          $ref: '../gma-shared/common.yaml#/components/schemas/LocalizedText'
+          nullable: true
+        localizedThumbnail:
+          $ref: '../gma-shared/common.yaml#/components/schemas/LocalizedText'    
+          nullable: true                 
+    BlogPostDeletedMessage:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        xTest:
+          type: boolean 
+  

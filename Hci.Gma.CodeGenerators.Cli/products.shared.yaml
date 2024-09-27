@@ -1,0 +1,91 @@
+openapi: 3.0.1
+info:
+  title: HCD Products (Shared)
+  version: v1
+paths: {}
+components: 
+  schemas:
+    ProductCreatedMessage:
+      type: object
+      properties:
+        id: 
+          type: string
+          format: uuid
+        categoryId:
+          type: string
+          format: uuid
+        hoselCategory:
+          type: string          
+        description:
+          $ref: '../gma-shared/common.yaml#/components/schemas/LocalizedText'
+        ean:
+          type: string
+        hero:
+          $ref: '../gma-shared/common.yaml#/components/schemas/Image'
+        manufacturer:
+          type: string
+        hoselManufacturer:
+          type: string
+          nullable: true
+        title: 
+          $ref: '../gma-shared/common.yaml#/components/schemas/LocalizedText'
+        gallery:
+          type: array
+          items:
+            $ref: '../gma-shared/common.yaml#/components/schemas/Image'
+          nullable: true
+        availableOffline:
+          type: boolean
+          nullable: true
+          default: true          
+        xTest:
+          type: boolean
+        attributes:
+          $ref: "../gma-shared/common.yaml#/components/schemas/ProductAttributes"
+          nullable: true          
+    ProductRemovedMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        xTest:
+          type: boolean
+    ProductUpdatedMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        categoryId:
+          type: string
+          format: uuid
+        hoselCategory:
+          type: string
+        description: 
+          $ref: '../gma-shared/common.yaml#/components/schemas/LocalizedText'
+        ean: 
+          type: string
+        hero: 
+          $ref: '../gma-shared/common.yaml#/components/schemas/Image'
+        manufacturer:
+          type: string
+        hoselManufacturer:
+          type: string
+          nullable: true
+        title: 
+          $ref: '../gma-shared/common.yaml#/components/schemas/LocalizedText'
+        gallery:
+          type: array
+          items:
+            $ref: '../gma-shared/common.yaml#/components/schemas/Image'
+          nullable: true
+        availableOffline:
+          type: boolean
+          nullable: true
+          default: true          
+        xTest:
+          type: boolean
+        attributes:
+          $ref: "../gma-shared/common.yaml#/components/schemas/ProductAttributes"
+          nullable: true

@@ -1,0 +1,5 @@
+is_global = true
+build_property.RootNamespace = Hci.Gma.CodeGenerators.YamlGenerators
+build_property.ProjectDir = C:\Users\genad\source\repos\yaml-code-generator\Hci.Gma.CodeGenerators.YamlGenerators\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 

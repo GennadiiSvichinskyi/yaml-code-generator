@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Hci.Gma.CodeGenerators.YamlGenerators": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\Hci.Gma.CodeGenerators.Cli\\Hci.Gma.CodeGenerators.Cli.csproj"
+    }
+  }
+}

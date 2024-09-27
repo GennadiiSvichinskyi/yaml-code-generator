@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="common.yaml" />
+    <None Remove="content.shared.yaml" />
+    <None Remove="deals.shared.yaml" />
+    <None Remove="lookups.yaml" />
+    <None Remove="mapp-backend.shared.yaml" />
+    <None Remove="products.shared.yaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="common.yaml" />
+    <AdditionalFiles Include="content.shared.yaml" />
+    <AdditionalFiles Include="deals.shared.yaml" />
+    <AdditionalFiles Include="lookups.yaml" />
+    <AdditionalFiles Include="mapp-backend.shared.yaml" />
+    <AdditionalFiles Include="products.shared.yaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hci.Gma.CodeGenerators.YamlGenerators\Hci.Gma.CodeGenerators.YamlGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true">
+      <PrivateAssets>All</PrivateAssets>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Program.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+</Project>

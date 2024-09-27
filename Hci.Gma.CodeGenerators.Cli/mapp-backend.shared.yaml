@@ -1,0 +1,166 @@
+openapi: 3.0.1
+info:
+  title: HCD MAPP Backend (Shared)
+  version: v1
+paths: {}
+components:
+  schemas:
+    MerchantBranchCreatedMessage:
+      additionalProperties: false
+      properties:
+        branchId:
+          type: string
+          format: uuid
+          nullable: false
+        name:
+          type: string
+        latitude:
+          type: number
+          format: double
+          nullable: false
+        longitude:
+          type: number
+          format: double
+          nullable: false
+        code:
+          type: string
+          nullable: false
+        address:
+          type: string
+          nullable: true
+        merchant:
+          $ref: "#/components/schemas/MerchantComponent"
+          nullable: true
+    MerchantBranchUpdatedMessage:
+      additionalProperties: false
+      properties:
+        branchId:
+          type: string
+          format: uuid
+          nullable: false
+        name:
+          type: string
+        latitude:
+          type: number
+          format: double
+          nullable: false
+        longitude:
+          type: number
+          format: double
+          nullable: false
+        code:
+          type: string
+          nullable: false
+        address:
+          type: string
+          nullable: true
+        merchant:
+          $ref: "#/components/schemas/MerchantComponent"
+          nullable: true
+    MerchantBranchDeletedMessage:
+      additionalProperties: false
+      properties:
+        branchId:
+          type: string
+          format: uuid
+          nullable: false
+    MerchantComponent:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          nullable: false
+        code:
+          type: string
+          nullable: false
+    MerchantBranchListResponse:
+      type: object
+      properties:
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        totalCount:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MerchantBranchDto"
+    MerchantBranchDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        code:
+          type: string
+          nullable: false
+        address:
+          type: string
+          nullable: true
+        pairingStatus:
+          $ref: "#/components/schemas/PairingStatusEnum"
+          nullable: true
+        merchant:
+          $ref: "#/components/schemas/MerchantDto"
+          nullable: true
+        location:
+          $ref: "#/components/schemas/LocationDto"
+          nullable: true
+        status:
+          $ref: "#/components/schemas/StatusEnum"
+          nullable: true
+        userRole:
+          $ref: "#/components/schemas/MerchantBranchUserRoleType"
+          nullable: true
+      additionalProperties: true
+    PairingStatusEnum:
+      type: string
+      enum:
+        - pendingApproval
+        - approved
+        - rejected
+        - canceled
+        - blocked
+    MerchantDto:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: false
+        code:
+          type: string
+          nullable: false
+        status:
+          $ref: "#/components/schemas/StatusEnum"
+          nullable: true
+      additionalProperties: true
+    LocationDto:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          nullable: false
+        longitude:
+          type: number
+          format: double
+          nullable: false
+      additionalProperties: true
+    StatusEnum:
+      type: string
+      enum:
+        - active
+        - blocked
+        - closed
+    MerchantBranchUserRoleType:
+      type: string
+      description: Role of user linked with specific merchant branch (POS). Role representative has limitted rights.
+      enum:
+        - owner
+        - representative
+        - assistant

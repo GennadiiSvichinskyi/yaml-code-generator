@@ -1,0 +1,214 @@
+openapi: 3.0.1
+info:
+  title: HCD Deals (Shared)
+  version: v1
+paths: {}
+components:
+  schemas:
+    CouponBrandClassification:
+      type: string
+      description: 'values of brand classification for coupons'
+      enum:
+        - mass
+        - premium
+        - luxury  
+    ProductAttributes:
+      type: object
+      properties:
+        keyFeatures:
+          type: object
+          additionalProperties:
+            type: string
+        warranty:
+          $ref: "#/components/schemas/ProductAttributeItem"
+          nullable: true 
+        general:
+          $ref: "#/components/schemas/ProductAttributeItem"
+          nullable: true 
+        detailSpecification:
+          type: array 
+          items:
+            $ref: "#/components/schemas/ProductAttributeItem"
+          nullable: true 
+    ProductAttributeValue:
+      type: object
+      description: "Key/Values dictionary. Sent as JSON in this format: { 'displaySize' : ['5.7'], 'ram' : ['4'] } "
+      additionalProperties:
+        type: array
+        items:
+          type: string
+      example:
+        displaySize: 
+          - "5.7"
+        ram : 
+          - "4"
+    ProductAttributeItem:
+      type: object
+      properties:
+        groupName: 
+          type: string
+        values:  
+          $ref: "#/components/schemas/ProductAttributeValue"    
+    CouponCreatedMessage:
+      type: object
+      properties:
+        couponId:
+          type: string
+          format: uuid
+        categoryId:
+          type: string
+          format: uuid          
+        couponImageUrl:
+          type: string
+        merchantBranchId:
+          type: string
+          format: uuid          
+        merchantIconUrl:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        externalId:
+          type: string
+        code:
+          type: string
+        introduction:
+          type: string
+        descriptionAbout:
+          type: string
+        descriptionNeedToKnow:
+          type: string             
+        isTopDeal:
+          type: boolean
+        isDailyDeal:
+          type: boolean
+        bannerText:
+          type: string
+          nullable: true
+        priceRegular:
+          type: number
+          format: double
+        priceDiscount:
+          type: number
+          format: double
+        brandName:
+          type: string
+          nullable: true
+        brandIconUrl:
+          type: string
+          nullable: true          
+        description:
+          type: string
+        url:
+          type: string
+          nullable: true
+        xpValue:
+          type: integer
+        couponsAvailable:
+          type: integer
+        validFrom:
+          type: string
+          format: date-time          
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        isActive:
+          type: boolean
+        isOnline:
+          type: boolean
+        xTest:
+          type: boolean
+        couponColor:
+          type: string
+        brandClassification:
+          $ref: '#/components/schemas/CouponBrandClassification'
+          description: 'Enumeration of brand classifications'
+      additionalProperties: true
+    CouponUpdatedMessage:
+      type: object
+      properties:
+        couponId:
+          type: string
+          format: uuid
+        categoryId:
+          type: string
+          format: uuid          
+        couponImageUrl:
+          type: string
+        merchantBranchId:
+          type: string
+          format: uuid          
+        merchantIconUrl:
+          type: string
+        name:
+          type: string
+        address:
+          type: string          
+        externalId:
+          type: string
+        code:
+          type: string
+        introduction:
+          type: string
+        descriptionAbout:
+          type: string
+        descriptionNeedToKnow:
+          type: string             
+        isTopDeal:
+          type: boolean
+        isDailyDeal:
+          type: boolean
+        bannerText:
+          type: string
+          nullable: true
+        priceRegular:
+          type: number
+          format: double
+        priceDiscount:
+          type: number
+          format: double
+        brandName:
+          type: string
+          nullable: true
+        brandIconUrl:
+          type: string
+          nullable: true          
+        description:
+          type: string
+        url:
+          type: string
+          nullable: true
+        xpValue:
+          type: integer
+        couponsAvailable:
+          type: integer
+        validFrom:
+          type: string
+          format: date-time          
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        isActive:
+          type: boolean
+        isOnline:
+          type: boolean
+        xTest:
+          type: boolean
+        couponColor:
+          type: string
+        brandClassification:
+          $ref: '#/components/schemas/CouponBrandClassification'
+          description: 'Enumeration of brand classifications'
+      additionalProperties: true
+    CouponDeletedMessage:
+      type: object
+      properties:
+        couponId:
+          type: string
+          format: uuid
+        xTest:
+          type: boolean
+      additionalProperties: true

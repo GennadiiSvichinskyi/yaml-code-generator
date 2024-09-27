@@ -1,0 +1,358 @@
+openapi: 3.0.1
+info:
+  title: HCD Lookups
+  version: v1
+paths:
+  '/lookups/merchants':
+    get:
+      tags: ["Merchants"]
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+  '/lookups/merchants/{id}':
+    get:
+      tags: ["Merchants"]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+        '403':
+          description: Forbidden
+        '404':
+          description: 'Lookup does not exist'
+  '/lookups/products':
+    get:
+      tags: ["Products"]
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: lang
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+  '/lookups/products/{id}':
+    get:
+      tags: ["Products"]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+        '403':
+          description: Forbidden
+        '404':
+          description: 'Lookup does not exist'
+  '/lookups/coupons':
+    get:
+      tags: ["Coupons"]
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+  '/lookups/coupons/{id}':
+    get:
+      tags: ["Coupons"]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+        '403':
+          description: Forbidden
+        '404':
+          description: 'Lookup does not exist'
+  '/lookups/links':
+    get:
+      tags: ["Links"]
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+  '/lookups/links/{id}':
+    get:
+      tags: ["Links"]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+        '403':
+          description: Forbidden
+        '404':
+          description: 'Lookup does not exist'
+  '/lookups/youtubes':
+    get:
+      tags: ["YouTubes"]
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/LookupResponse'
+  '/lookups/youtubes/{id}':
+    get:
+      tags: ["YouTubes"]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/LookupItem'
+        '403':
+          description: Forbidden
+        '404':
+          description: 'Lookup does not exist'
+  '/lookups/merchants-refresh':
+    post:
+      tags: ["Merchants"]
+      parameters:
+        - name: lastSync
+          in: query
+          schema:
+            type: string
+            format: date-time
+            nullable: true
+      responses:
+        '204':
+          description: Success
+
+components:
+  schemas:
+    LookupResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/LookupItem'
+    LookupItem:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+
+    #External messages
+
+    #mapp-backend.yaml
+    MerchantBranchCreatedMessage:
+      $ref: "../gma-shared/mapp-backend.shared.yaml#/components/schemas/MerchantBranchCreatedMessage"
+    MerchantBranchDeletedMessage:
+      $ref: "../gma-shared/mapp-backend.shared.yaml#/components/schemas/MerchantBranchDeletedMessage"
+    MerchantBranchUpdatedMessage:
+      $ref: "../gma-shared/mapp-backend.shared.yaml#/components/schemas/MerchantBranchUpdatedMessage"
+    MerchantComponent:
+      $ref: "../gma-shared/mapp-backend.shared.yaml#/components/schemas/MerchantComponent"
+    MerchantBranchListResponse:
+      $ref: '../gma-shared/mapp-backend.shared.yaml#/components/schemas/MerchantBranchListResponse'
+    MerchantBranchDto:
+      $ref: '../gma-shared/mapp-backend.shared.yaml#/components/schemas/MerchantBranchDto'
+    PairingStatusEnum:
+      $ref: '../gma-shared/mapp-backend.shared.yaml#/components/schemas/PairingStatusEnum'
+    MerchantDto:
+      $ref: '../gma-shared/mapp-backend.shared.yaml#/components/schemas/MerchantDto'
+    StatusEnum:
+      $ref: '../gma-shared/mapp-backend.shared.yaml#/components/schemas/StatusEnum'
+    LocationDto:
+      $ref: '../gma-shared/mapp-backend.shared.yaml#/components/schemas/LocationDto'
+    MerchantBranchUserRoleType:
+      $ref: '../gma-shared/mapp-backend.shared.yaml#/components/schemas/MerchantBranchUserRoleType'  
+
+    #deals.yaml
+    CouponBrandClassification:
+      $ref: "../gma-shared/deals.shared.yaml#/components/schemas/CouponBrandClassification"
+    ProductAttributes:
+      $ref: "../gma-shared/deals.shared.yaml#/components/schemas/ProductAttributes"
+    ProductAttributeValue:
+      $ref: "../gma-shared/deals.shared.yaml#/components/schemas/ProductAttributeValue"
+    ProductAttributeItem:
+      $ref: "../gma-shared/deals.shared.yaml#/components/schemas/ProductAttributeItem"
+    CouponCreatedMessage:
+      $ref: "../gma-shared/deals.shared.yaml#/components/schemas/CouponCreatedMessage"
+    CouponUpdatedMessage:
+      $ref: "../gma-shared/deals.shared.yaml#/components/schemas/CouponUpdatedMessage"
+    CouponDeletedMessage:
+      $ref: "../gma-shared/deals.shared.yaml#/components/schemas/CouponUpdatedMessage"
+
+    #content.yaml
+    ContentState:
+      $ref: "../gma-shared/content.shared.yaml#/components/schemas/ContentState"
+    ContentType:
+      $ref: "../gma-shared/content.shared.yaml#/components/schemas/ContentType"
+    TouchPoint:
+      $ref: "../gma-shared/content.shared.yaml#/components/schemas/TouchPoint"    
+    ContentCreatedMessage:
+      $ref: "../gma-shared/content.shared.yaml#/components/schemas/ContentCreatedMessage"
+    ContentUpdatedMessage:
+      $ref: "../gma-shared/content.shared.yaml#/components/schemas/ContentUpdatedMessage"
+    ContentRemovedMessage:
+      $ref: "../gma-shared/content.shared.yaml#/components/schemas/ContentRemovedMessage"
+
+    #products.yaml
+    ProductCreatedMessage:
+      $ref: "../gma-shared/products.shared.yaml#/components/schemas/ProductCreatedMessage"
+    ProductUpdatedMessage:
+      $ref: "../gma-shared/products.shared.yaml#/components/schemas/ProductUpdatedMessage"
+    ProductRemovedMessage:
+      $ref: "../gma-shared/products.shared.yaml#/components/schemas/ProductRemovedMessage"
+
+    # LocalizedText:
+    #   $ref: '../gma-shared/common.yaml#/components/schemas/LocalizedText'
+    # Image:
+    #   $ref: "../gma-shared/common.yaml#/components/schemas/Image"
+    # ImageAspectRatio:
+    #   $ref: "../gma-shared/common.yaml#/components/schemas/ImageAspectRatio"
+    # ImageDto:
+    #   $ref: "../gma-shared/common.yaml#/components/schemas/ImageDto"  
+    # ImageTag:
+    #   $ref: "../gma-shared/common.yaml#/components/schemas/ImageTag"
+    # Tag:
+    #   $ref: '../gma-shared/common.yaml#/components/schemas/Tag'
+    # AuthorDto:
+    #   $ref: "../gma-shared/common.yaml#/components/schemas/AuthorDto"

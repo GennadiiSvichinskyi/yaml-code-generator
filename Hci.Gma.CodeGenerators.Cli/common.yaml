@@ -1,0 +1,444 @@
+openapi: '3.0.3'
+info:
+  title: Common contracts
+  version: '1.0'
+  contact:
+    name: 'Platform team'
+  description: 'Common contracts referenced by other specifications'
+servers:
+  - url: NA
+
+paths: {}
+
+components:
+  schemas:
+    TileType:
+      type: string
+      description: 1:1 - small, 2:2 - large, 3:3 - xlarge, 3:2 - xwide, 3:1 - wide, 1:2 - tall
+      enum:
+        - none
+        - large
+        - small
+        - tall
+        - wide
+        - xlarge
+        - xwide
+    ImageAspectRatio:
+      type: string
+      description: 1:1 - square, 3:2 - landscape , 3:1 - xlandscape , 2:3 - portrait,  1:3 - xportrait
+      enum:
+        - square
+        - landscape
+        - xlandscape
+        - portrait
+        - xportrait
+    Image:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        url:
+          type: string
+          nullable: true
+          description: URL of the image if specified.
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          nullable: true
+        isExternal:
+          type: boolean
+          nullable: true
+        position:
+          type: integer
+          nullable: true
+          description: Define order of picture 
+      additionalProperties: true         
+    ImageDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImageTag"
+          nullable: true      
+    ImageTag:
+      enum:
+        - imageTile
+        - imageDetail
+        - imageBlogPost
+      type: string          
+    LocalizedText:
+      type: object
+      description: 'Dictionary where the key is language code and the value is localized text. Language code is defined by IETF BCP 47 (e.g. `en`, `cs-CZ`, etc.).'
+      additionalProperties:
+        type: string
+      example:
+        en: Hello!
+        hi: Namaste!
+    Tag:
+      type: string
+      enum:
+        - imageDetail
+        - imageTile
+        - imageBlogPost
+        - imagePictogram
+        - imageIcon
+    Error:
+      description: 'HTTP status codes are used to differentiate response results. To distinguish possible reasons there is detailed Error.'
+      type: object
+      properties:
+        isError:
+          description: 'Indicates the error.'
+          type: boolean
+        errorId:
+          description: 'Generated GUID which can be used to find more details in logs.'
+          type: string
+          format: uuid
+        message:
+          description: "Description of error.
+            It could be displayed to the user only in edge cases.
+            It is not expected to be localised text.
+            It should not contain a message like: 'Object reference not set to an instance of an object.'
+            The message should contain the main reason."
+          type: string
+          nullable: true
+        type:
+          description: "Differentiation of the reason among the HTTP status codes.
+            It could be a custom error type like 'ProductNotExist' or custom error code number.
+            It should not be just: 'NullReferenceException'."
+          type: string
+          nullable: true
+      additionalProperties: true
+    PriceType:
+      type: string
+      description: TotalCost - origin (regular) price, TotalCostCash - regular price by cash, DiscountTotal - new discount price, DiscountPercent - percent discount from TotalCost
+      enum:
+        - totalCost
+        - installment
+        - discountTotal
+        - discountPercent
+        - installmentPerDay
+        - installmentPerWeek
+        - installmentPerMonth
+        - installmentPerYear
+        - totalCostCash
+        - discountTotalMax
+        - cashbackTotal
+        - cashbackPercent
+        - cashbackTotalMax
+        - installmentPerMonthTotal
+        - downpayment
+        - cashPayment
+        - processingFee
+    PricePaymentType:
+      type: string
+      description: Payment type such as cash, loan.
+      enum:
+        - cash
+        - loan
+    Price:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: double
+        type:
+          $ref: '#/components/schemas/PriceType'
+        paymentType:
+          allOf:
+            - $ref: '#/components/schemas/PricePaymentType'
+          # default value eg when missing in message
+          default: PricePaymentType.Cash
+          # Nullable is needed here until Default support is implemented in Dart generator
+          nullable: true
+      additionalProperties: true
+    EnumerationType:
+      type: string
+      enum:
+        - categories
+        - tags
+        - loanPurposes
+        - occupations
+        - maritalStatuses
+        - genders
+        - educations
+        - textCategories
+        - restTestEnumerations
+        - jobs
+        - maleFaces
+        - femaleFaces
+        - maleClothes
+        - femaleClothes
+        - dealsFilters
+        - housing
+        - relationship
+        - industryType
+        - faqSubCategories
+        - blogPostsCategories
+        - inboxMessageCategories
+        - communicationChannels
+        - generalFeedbackCategories
+        - feedbackFlows
+        - deeplinkDomainWhitelist
+        - voucherCategories
+        - voucherMerchants
+        - eBillerLogos
+        - eLoaderLogos
+        - promoCategories
+        - otcPartnerLogos
+        - vasLogos
+    LocalizationResponse:
+      type: object
+      additionalProperties:
+        type: object
+        nullable: true
+      example:
+        # Localization file in i18next format. To get text use i18next.t("capp-gamin.nested.key")
+        {
+          'capp-share': { 'hello': 'Hello world!' },
+          'capp-gaming': { 'key': 'Key translation', 'nested': { 'key': 'Nested key translation' } },
+        }
+    OtpConfirmationRequest:
+      type: object
+      properties:
+        code:
+          type: string
+    OtpError:
+      description: 'OTP error detail'
+      type: object
+      properties:
+        errorType:
+          type: string
+          enum:
+            - codeNotMatched
+            - codeExpired
+            - maxAttemptsReached
+            - other
+        remainingAttempts:
+          type: integer
+          format: int32
+        message:
+          type: string
+          nullable: true
+      additionalProperties: true
+
+    DomainEvent:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        timestamp: { type: string, format: date-time }
+        aggregateId: { type: string, description: Identification of a domain object which this event relates to. It could be e.g. same as the userId. }
+    AccessLevel:
+      type: string
+      description: User access level
+      enum:
+        - public
+        - insider
+    ProblemDetails: 
+      type: object
+      properties: 
+        type: 
+          type: string
+          nullable: true
+        title: 
+          type: string
+          nullable: true
+        status: 
+          type: integer
+          format: int32
+          nullable: true
+        detail: 
+          type: string
+          nullable: true
+        instance: 
+          type: string
+          nullable: true
+      additionalProperties: false
+    AuditLogsResponse:
+      type: object
+      additionalProperties: false        
+      properties:
+        page:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalCount:
+          type: integer
+          format: int32      
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuditLogItem"
+    AuditLogItem:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string        
+          format: uuid
+        trackingItemId:
+          type: string        
+          format: uuid
+        consumerServiceSubcategory:
+          type: string
+          nullable: true
+        userName:
+          type: string
+          nullable: true
+        date:
+          type: string
+          format: date-time    
+          nullable: false
+        actionType:
+          $ref: '#/components/schemas/AuditLogActionType'
+        jsonData:
+          type: string
+          nullable: false
+    AuditLogActionType:
+        type: string
+        enum:
+          - created
+          - updated
+          - deleted
+          - enabled
+          - disabled
+          - reordered    
+    AuthorDto:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        icon:
+          type: string
+          nullable: true
+      additionalProperties: true
+    ApprovalRequestsResponseDto:
+      type: object
+      additionalProperties: false       
+      properties:
+        page:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalCount:
+          type: integer
+          format: int32
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovalRequestDto' 
+    ApprovalRequestDto:
+      type: object
+      additionalProperties: false         
+      properties:    
+        id:
+          type: string
+          format: uuid     
+        approvableEntityId:
+          type: string
+          format: uuid    
+          nullable: true           
+        consumerServiceSubcategory:
+          type: string         
+          nullable: true                      
+        createdAt:
+          type: string
+          format: date-time
+        createdByUserId:
+          type: string
+          format: uuid  
+        createdByUserName:
+          type: string
+          nullable: true           
+        reviewedByUserId:
+          type: string
+          format: uuid
+          nullable: true           
+        reviewedByUserName:
+          type: string
+          nullable: true           
+        reviewedAt:
+          type: string
+          format: date-time  
+          nullable: true 
+        updatedAt:
+          type: string
+          format: date-time   
+          nullable: true     
+        rejectReason:
+          type: string  
+          nullable: true    
+        editable:
+          type: boolean                         
+        jsonData:
+          type: string
+        operationType:
+          type: string
+        approvalStatus:
+          type: string
+    RequestApprovedResponseDto:
+      type: object
+      additionalProperties: false  
+      properties:    
+        entityId:
+          type: string
+          format: uuid     
+        jsonData:
+          type: string
+        operationType:
+          $ref: '#/components/schemas/OperationType' 
+        requestCreatedByUserId:
+          type: string
+          format: uuid 
+        requestCreatedByUserName:
+          type: string
+          nullable: true                  
+    RejectApprovalRequestDto:
+      type: object
+      additionalProperties: false  
+      properties:    
+        requestId:
+          type: string
+          format: uuid             
+        rejectReason:
+          type: string
+          nullable: true               
+    OperationType:
+      enum:
+        - Create
+        - Update
+        - Delete                  
+
+  responses:
+    400BadRequest:
+      description: Bad request
+      content:
+        text/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    401Unauthenticated:
+      description: Unauthenticated
+      content:
+        text/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    403Unauthorized:
+      description: Forbidden - User not authorized
+      content:
+        text/json:
+          schema:
+            $ref: '#/components/schemas/Error'
