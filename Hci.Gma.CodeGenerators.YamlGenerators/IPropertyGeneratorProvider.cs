@@ -2,7 +2,7 @@
 
 namespace Hci.Gma.CodeGenerators.YamlGenerators;
 
-public interface IPropertyGeneratorProvider
+internal interface IPropertyGeneratorProvider
 {
     IPropertyGenerator GetPropertyGenerator(string type);
 }

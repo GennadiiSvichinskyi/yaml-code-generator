@@ -16,6 +16,7 @@ internal static class Constants
         public const string Items = "items";
         public const string Enum = "enum";
         public const string Default = "default";
+        public const string Description = "description";
     }
     
 }

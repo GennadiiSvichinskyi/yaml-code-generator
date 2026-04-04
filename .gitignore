@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Hci.Gma.CodeGenerators.Cli/bin/Debug
+/Hci.Gma.CodeGenerators.YamlGenerators/bin/Debug
+/Hci.Gma.CodeGenerators.Cli/obj
+/Hci.Gma.CodeGenerators.YamlGenerators/obj

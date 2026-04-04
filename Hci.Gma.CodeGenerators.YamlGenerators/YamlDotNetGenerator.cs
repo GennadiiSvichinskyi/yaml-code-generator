@@ -1,5 +1,4 @@
 ﻿using Hci.Gma.CodeGenerators.YamlGenerators.Extensions;
-using Hci.Gma.CodeGenerators.YamlGenerators.PropertyGenerators;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using System;
@@ -14,12 +13,7 @@ namespace Hci.Gma.CodeGenerators.YamlGenerators
     [Generator]
     public class YamlDotNetGenerator : IIncrementalGenerator
     {
-        private IPropertyGeneratorProvider _propertyGeneratorProvider;
-
-        public YamlDotNetGenerator()
-        {
-            _propertyGeneratorProvider = new PropertyGeneratorProvider();
-        }
+        private static readonly IPropertyGeneratorProvider _propertyGeneratorProvider = new PropertyGeneratorProvider();
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             var yamlFiles = context
@@ -87,14 +81,7 @@ namespace Hci.Gma.CodeGenerators.YamlGenerators
         private string CreateRecordDefinitions(YamlMappingNode schemasValue, string? dir = "Generated")
         {
             var result = new StringBuilder();
-            result.Append($@"
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-#nullable enable
-namespace {dir}.Dtos
-{{");
+            result.Append(CreateFileHeader(dir));
             foreach (var schema in schemasValue)
             {
                 var node = schema.Value as YamlMappingNode;
@@ -106,45 +93,52 @@ namespace {dir}.Dtos
                          && node.Any(x => x.Key.ToString() == Constants.NodeNames.Type
                                           && ((YamlScalarNode)node[Constants.NodeNames.Type]).Value == "array"))
                 {
-                    result.Append(GenerateArray(node, schema.Key,  GenerateAdditionalProperties));
+                    result.Append(GenerateArray(node, schema.Key, GenerateAdditionalProperties));
                 }
                 else
                 {
-                    result.Append(GenerateDto(schema, GenerateAdditionalProperties));
-                }                
+                    result.Append(GenerateClassDefinition(schema, GenerateAdditionalProperties));
+                }
             }
-            result.Append($@"
-}}");
-            result.AppendLine();
+            result.Append(CreateFileFooter());
             return result.ToString();
         }
 
         private string CreateMessageDefinitions(YamlMappingNode schemasValue, string? dir = "Generated")
         {
             var result = new StringBuilder();
-            result.Append($@"
+            result.Append(CreateFileHeader(dir));
+            foreach (var schema in schemasValue)
+            {
+                var node = schema.Value as YamlMappingNode;
+                if (node is not null
+                         && node.Any(x => x.Key.ToString() == Constants.NodeNames.Type
+                                          && ((YamlScalarNode)node[Constants.NodeNames.Type]).Value == "array"))
+                {
+                    result.Append(GenerateArray(node, schema.Key, GenerateAdditionalProperties));
+                }
+                else
+                {
+                    result.Append(GenerateClassDefinition(schema, GenerateAdditionalProperties, isPartial: true));
+                }
+            }
+            result.Append(CreateFileFooter());
+            return result.ToString();
+        }
+
+        private static string CreateFileHeader(string? dir) =>
+            $@"
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 #nullable enable
 namespace {dir}.Dtos
-{{");
-            foreach (var schema in schemasValue)
-            {
-                var node = schema.Value as YamlMappingNode;
-              
-                if (node is not null
-                         && node.Any(x => x.Key.ToString() == Constants.NodeNames.Type
-                                          && ((YamlScalarNode)node[Constants.NodeNames.Type]).Value == "array"))
-                {
-                    result.Append(GenerateArray(node, schema.Key,  GenerateAdditionalProperties));
-                }
-                else
-                {
-                    result.Append(GenerateMessage(schema, GenerateAdditionalProperties));
-                }                
-            }
+{{";
+
+        private static string CreateFileFooter()
+        {
+            var result = new StringBuilder();
             result.Append($@"
 }}");
             result.AppendLine();
@@ -178,6 +172,7 @@ namespace {dir}.Dtos
             var typeNode = (YamlScalarNode)node[Constants.NodeNames.Type];
             if (typeNode.Value == "array")
             {
+                result.Append(GetXmlDocComment(node, "    "));
                 result.Append($@"
     public class {key}
     {{");
@@ -198,6 +193,7 @@ namespace {dir}.Dtos
             
             var result = new StringBuilder();
             var enumNode = node[Constants.NodeNames.Enum];
+            result.Append(GetXmlDocComment(node, "    "));
             result.Append($@"
     public enum {key}
     {{");
@@ -214,7 +210,10 @@ namespace {dir}.Dtos
             return result.ToString();
         }
 
-        private string GenerateMessage(KeyValuePair<YamlNode, YamlNode> schema, Func<YamlMappingNode?, string> postGenerator)
+        private string GenerateClassDefinition(
+            KeyValuePair<YamlNode, YamlNode> schema,
+            Func<YamlMappingNode?, string> postGenerator,
+            bool isPartial = false)
         {
             var result = new StringBuilder();
             var dtoContent = schema.Value as YamlMappingNode;
@@ -225,57 +224,24 @@ namespace {dir}.Dtos
                 return result.ToString();
             }
             var (inheritance, allOfProperties, additionalProperties) = AddInheritance(dtoContent);
+            var partialKeyword = isPartial ? "partial " : string.Empty;
+            result.Append(GetXmlDocComment(dtoContent, "    "));
             result.Append($@"
-    public partial class {schema.Key} {inheritance}
+    public {partialKeyword}class {schema.Key}{(inheritance != null ? " " + inheritance : string.Empty)}
     {{");
-            if (dtoContent != null && 
-                dtoContent.Any(x => x.Key.ToString() == Constants.NodeNames.Properties))
-            {
-                var properties = dtoContent[Constants.NodeNames.Properties];
-                GenerateProperties(result, properties, allOfProperties);                
-            }
-            if (allOfProperties is not null)
-            {
-                GenerateProperties(result, new YamlMappingNode(), allOfProperties);                
-            }
-            if (additionalProperties is not null)
-            {
-                result.Append(additionalProperties);            
-            }
-            result.Append(postGenerator(dtoContent));
-            result.Append($@"
-    }}");
-            result.AppendLine();
-            return result.ToString();
-        }
-        // TODO: enums
-        private string GenerateDto(KeyValuePair<YamlNode, YamlNode> schema, Func<YamlMappingNode?, string> postGenerator)
-        {
-            var result = new StringBuilder();
-            var dtoContent = schema.Value as YamlMappingNode;
             if (dtoContent != null &&
-                dtoContent.Any(x => x.Key.ToString() == Constants.NodeNames.Reference))
-            {
-                // ignore referenced objects as they have to be in the separated *.shared.yaml file
-                return result.ToString();
-            }
-            var (inheritance, allOfProperties, additionalProperties) = AddInheritance(dtoContent);
-            result.Append($@"
-    public class {schema.Key} {inheritance}
-    {{");
-            if (dtoContent != null && 
                 dtoContent.Any(x => x.Key.ToString() == Constants.NodeNames.Properties))
             {
                 var properties = dtoContent[Constants.NodeNames.Properties];
-                GenerateProperties(result, properties, allOfProperties);                
+                GenerateProperties(result, properties, allOfProperties);
             }
             if (allOfProperties is not null)
             {
-                GenerateProperties(result, new YamlMappingNode(), allOfProperties);                
+                GenerateProperties(result, new YamlMappingNode(), allOfProperties);
             }
             if (additionalProperties is not null)
             {
-                result.Append(additionalProperties);            
+                result.Append(additionalProperties);
             }
             result.Append(postGenerator(dtoContent));
             result.Append($@"
@@ -309,10 +275,10 @@ namespace {dir}.Dtos
                 var typeNode = (YamlScalarNode)mappingNode[Constants.NodeNames.Type];
                 if (typeNode.Value != null)
                 {
-                    _propertyGeneratorProvider = new PropertyGeneratorProvider();
                     var generator = _propertyGeneratorProvider.GetPropertyGenerator(typeNode.Value);
                     var type = generator.GetType(mappingNode);                   
                     var camelCaseKey = propertyKey.ToString().ToCamelCase();
+                    result.Append(GetXmlDocComment(mappingNode, "        "));
                     result.Append($@"
         [JsonProperty(""{propertyKey}"")]
         public {type.CheckNullableType(mappingNode)} {camelCaseKey} {{ get; set; }} {CheckDefault(mappingNode)}");
@@ -332,6 +298,7 @@ namespace {dir}.Dtos
                         var type = refNode.Value?.Substring(refNode.Value.LastIndexOf('/') + 1); 
                         if( type is not null ) type = type.CheckNullableType(mappingNodeAllOf);
                         var camelCaseKey = propertyKey.ToString().ToCamelCase();
+                        result.Append(GetXmlDocComment(mappingNodeAllOf, "        "));
                         result.Append($@"
         [JsonProperty(""{propertyKey}"")]                      
         public {type} {camelCaseKey} {{ get; set; }} {CheckDefault(mappingNodeAllOf)}");
@@ -348,12 +315,41 @@ namespace {dir}.Dtos
                     var type = refNode.Value?.Substring( refNode.Value.LastIndexOf('/') + 1);
                     if( type is not null ) type = type.CheckNullableType(mappingNodeRef);
                     var camelCaseKey = propertyKey.ToString().ToCamelCase();
+                    result.Append(GetXmlDocComment(mappingNodeRef, "        "));
                     result.Append($@"
         [JsonProperty(""{propertyKey}"")]                   
         public {type} {camelCaseKey} {{ get; set; }} {CheckDefault(mappingNodeRef)}");
                     result.AppendLine();
                 }
             }
+        }
+
+        private static string GetXmlDocComment(YamlMappingNode? node, string indent)
+        {
+            if (node is null || node.All(x => x.Key.ToString() != Constants.NodeNames.Description))
+                return string.Empty;
+
+            var descriptionNode = (YamlScalarNode)node[Constants.NodeNames.Description];
+            var description = descriptionNode.Value;
+            if (string.IsNullOrWhiteSpace(description))
+                return string.Empty;
+
+            description = description
+                .Replace("&", "&amp;")
+                .Replace("<", "&lt;")
+                .Replace(">", "&gt;");
+
+            var result = new StringBuilder();
+            result.Append($@"
+{indent}/// <summary>");
+            foreach (var line in description.Split('\n'))
+            {
+                result.Append($@"
+{indent}/// {line.TrimEnd()}");
+            }
+            result.Append($@"
+{indent}/// </summary>");
+            return result.ToString();
         }
 
         private string? CheckDefault(YamlMappingNode mappingNode, string? enumType = null, bool isEnum = false)
@@ -364,7 +360,7 @@ namespace {dir}.Dtos
                if (isEnum && defaultNode.Value != null)
                {
                    var camelCaseDefault = defaultNode.ToString().ToCamelCase();
-                   return $" = \"{enumType}.{camelCaseDefault}\";";
+                   return $" = {enumType}.{camelCaseDefault};";
                }
 
                return $" = {defaultNode.Value};";
@@ -416,26 +412,19 @@ namespace {dir}.Dtos
             return (inheritance, allOfProperties, additionalProperties);
         }
 
-        private static string GenerateAdditionalPropertiesInheritance( YamlMappingNode additionalPropertiesNode)
+        private static string GenerateAdditionalPropertiesInheritance(YamlMappingNode additionalPropertiesNode)
         {
             if (additionalPropertiesNode.All(x => x.Key.ToString() != Constants.NodeNames.Type))
             {
                 return $": Dictionary<{nameof(String)}, {nameof(String)}>";
             }
             var typeAdditionalProperties = (YamlScalarNode?)additionalPropertiesNode[Constants.NodeNames.Type];
-            IPropertyGenerator generator = typeAdditionalProperties?.Value switch
+            if (typeAdditionalProperties?.Value == null)
             {
-                "string" => new StringPropertyGenerator(),
-                "integer" => new IntegerPropertyGenerator(),
-                "number" => new NumberPropertyGenerator(),
-                "boolean" => new BooleanPropertyGenerator(),
-                "object" => new ObjectPropertyGenerator(),
-                "array" => new ArrayPropertyGenerator(),
-                _ => new ObjectPropertyGenerator()
-            };
-            return typeAdditionalProperties == null
-                ? $": Dictionary<{nameof(String)}, {nameof(String)}>"
-                : $": Dictionary<{nameof(String)}, {generator.GetType(additionalPropertiesNode)}>";
+                return $": Dictionary<{nameof(String)}, {nameof(String)}>";
+            }
+            var generator = _propertyGeneratorProvider.GetPropertyGenerator(typeAdditionalProperties.Value);
+            return $": Dictionary<{nameof(String)}, {generator.GetType(additionalPropertiesNode)}>";
         }
     }
 }

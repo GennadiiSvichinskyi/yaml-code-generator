@@ -3,7 +3,7 @@ using System.Linq;
 using YamlDotNet.RepresentationModel;
 
 namespace Hci.Gma.CodeGenerators.YamlGenerators.PropertyGenerators;
-public class IntegerPropertyGenerator : IPropertyGenerator
+internal class IntegerPropertyGenerator : IPropertyGenerator
 {
     public string GetType(YamlMappingNode node)
     {

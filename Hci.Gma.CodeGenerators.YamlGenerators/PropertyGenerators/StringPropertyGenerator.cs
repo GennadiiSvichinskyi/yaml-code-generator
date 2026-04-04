@@ -17,6 +17,10 @@ internal class StringPropertyGenerator : IPropertyGenerator
             }
             else if (typeFormat.Value == "date-time")
             {
+                type = nameof(DateTimeOffset);
+            }
+            else if (typeFormat.Value == "date")
+            {
                 type = nameof(DateTime);
             }
         }

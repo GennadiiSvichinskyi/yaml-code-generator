@@ -2,19 +2,27 @@
 using Hci.Gma.CodeGenerators.YamlGenerators.PropertyGenerators;
 
 namespace Hci.Gma.CodeGenerators.YamlGenerators;
-public class PropertyGeneratorProvider : IPropertyGeneratorProvider
+internal class PropertyGeneratorProvider : IPropertyGeneratorProvider
 {
-    private static Dictionary<string, IPropertyGenerator> PropertyGeneratorDictionary { get; } = new()
+    private readonly Dictionary<string, IPropertyGenerator> _generators;
+
+    public PropertyGeneratorProvider()
     {
-        {"string", new StringPropertyGenerator()},
-        {"integer", new IntegerPropertyGenerator()},
-        {"number", new NumberPropertyGenerator()},
-        {"boolean", new BooleanPropertyGenerator()},
-        {"array", new ArrayPropertyGenerator()},
-        {"object", new ObjectPropertyGenerator()}
-    };
+        _generators = new Dictionary<string, IPropertyGenerator>
+        {
+            { "string",  new StringPropertyGenerator() },
+            { "integer", new IntegerPropertyGenerator() },
+            { "number",  new NumberPropertyGenerator() },
+            { "boolean", new BooleanPropertyGenerator() },
+            { "object",  new ObjectPropertyGenerator(this) },
+            { "array",   new ArrayPropertyGenerator(this) }
+        };
+    }
+
     public IPropertyGenerator GetPropertyGenerator(string type)
     {
-        return PropertyGeneratorDictionary[type];
+        return _generators.TryGetValue(type, out var generator)
+            ? generator
+            : _generators["object"];
     }
 }

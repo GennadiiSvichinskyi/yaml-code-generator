@@ -2,7 +2,7 @@
 
 namespace Hci.Gma.CodeGenerators.YamlGenerators.PropertyGenerators;
 
-public interface IPropertyGenerator
+internal interface IPropertyGenerator
 {
     string GetType(YamlMappingNode node);
 }
